@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -16,6 +17,15 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
 
     @Autowired
     private NeedLogInterceptor needLogInterceptor;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("*")
+                .allowedOrigins("*")
+                .allowedHeaders("*");
+        super.addCorsMappings(registry);
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -36,9 +46,14 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
      */
     @Bean
     public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", buildConfig()); // 4
-        return new CorsFilter(source);
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.setAllowCredentials(true);
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        UrlBasedCorsConfigurationSource configSource = new UrlBasedCorsConfigurationSource();
+        configSource.registerCorsConfiguration("/**", config);
+        return new CorsFilter(configSource);
     }
 
 }
